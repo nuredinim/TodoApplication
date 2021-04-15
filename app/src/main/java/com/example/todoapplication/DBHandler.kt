@@ -63,6 +63,47 @@ SQLiteOpenHelper(context, DATABASE_NAME, cursorFactory, DATABASE_VERSION){
         db.close()
     }
 
+    /**
+     * This method gets called when the MainActivity is created and
+     * when the Add and Delete buttons get clicked
+     * @return MutableList of ToDos that contains all of the data in
+     * the todo table.
+     */
+    val todos: MutableList<ToDo>
+        get() {
+            // get a reference to the todoapp database
+            val db = writableDatabase
+
+            // define select statement
+            val query = "SELECT * FROM " + TABLE_TODO_LIST
+
+            // execute the select statement and store its return in an
+            // immutable cursor
+            val c = db.rawQuery(query,null)
+
+            // create Mutable List of ToDOs that wil be returned by method
+            val list: MutableList<ToDo> = ArrayList()
+
+            // loop through the rows in the cursor
+            while (c.moveToNext()){
+                // create an immutable ToDo using the data in the current
+                // row in the Cursor
+                val todo: ToDo = ToDo(c.getInt(c.getColumnIndex("_id")),
+                c.getString(c.getColumnIndex("name")),
+                c.getString(c.getColumnIndex("is_checked")).toBoolean())
+
+                // add the todo that was just created into the MutableList
+                // of todos
+                list.add(todo)
+            }
+
+            // close database reference
+            db.close()
+
+            // return the MutableList of ToDos
+            return list
+        }
+
     companion object {
         // initialize constants for the DB name and version
         private const val DATABASE_NAME = "todoapp.db"
